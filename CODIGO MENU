@@ -6,7 +6,7 @@ int main() {
     int opcion;
 
     do {
-        // Mostrar el menú
+        
         cout << "=== Menú ===" << endl;
         cout << "1. Opción 1" << endl;
         cout << "2. Opción 2" << endl;
@@ -14,7 +14,7 @@ int main() {
         cout << "Elija una opción: ";
         cin >> opcion;
 
-        // Evaluar la opción seleccionada
+
         switch (opcion) {
             case 1:
                 cout << "Opción 1 seleccionada" << endl;
@@ -28,7 +28,7 @@ int main() {
   
         }
 
-        cout << endl;  // Salto de línea para mayor legibilidad
+        cout << endl; 
 
     } while (opcion != 3);
 
