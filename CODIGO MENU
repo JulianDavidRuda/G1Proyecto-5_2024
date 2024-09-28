@@ -1,0 +1,36 @@
+#include <iostream>
+
+using namespace std;
+
+int main() {
+    int opcion;
+
+    do {
+        // Mostrar el menú
+        cout << "=== Menú ===" << endl;
+        cout << "1. Opción 1" << endl;
+        cout << "2. Opción 2" << endl;
+        cout << "3. Salir" << endl;
+        cout << "Elija una opción: ";
+        cin >> opcion;
+
+        // Evaluar la opción seleccionada
+        switch (opcion) {
+            case 1:
+                cout << "Opción 1 seleccionada" << endl;
+                break;
+            case 2:
+                cout << "Opción 2 seleccionada" << endl;
+                break;
+            case 3:
+                cout << "Saliendo..." << endl;
+                break;
+  
+        }
+
+        cout << endl;  // Salto de línea para mayor legibilidad
+
+    } while (opcion != 3);
+
+    return 0;
+}
