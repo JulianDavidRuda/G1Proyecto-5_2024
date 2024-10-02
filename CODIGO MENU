@@ -1,36 +1,101 @@
 #include <iostream>
-
+#include <string>
 using namespace std;
 
-int main() {
-    int opcion;
+const int TOTAL_PUESTOS = 40;
+double tarifaPorHora = 5.0;
 
+struct Puesto {
+    int numero;
+    string placa;
+    string horaEntrada;
+    bool ocupado = false;
+};
+
+int main() {
+    Puesto parqueadero[TOTAL_PUESTOS];
+    for (int i = 0; i < TOTAL_PUESTOS; i++) {
+        parqueadero[i].numero = i + 1;
+    }
+
+    char opcion;
     do {
-        
-        cout << "=== Menú ===" << endl;
-        cout << "1. Opción 1" << endl;
-        cout << "2. Opción 2" << endl;
-        cout << "3. Salir" << endl;
+        cout << "\nBienvenido al sistema de administración de parqueadero\n";
+        cout << "1. Ingresar un carro al parqueadero\n";
+        cout << "2. Dar salida a un carro del parqueadero\n";
+        cout << "3. Consultar puestos disponibles\n";
+        cout << "4. Cambiar la tarifa del parqueadero\n";
+        cout << "5. Salir\n";
         cout << "Elija una opción: ";
         cin >> opcion;
 
+        if (opcion == '1') {
+            string placa, hora;
+            cout << "Ingrese la placa del carro: ";
+            cin >> placa;
+            cout << "Ingrese la hora de entrada (formato HH:MM): ";
+            cin >> hora;
 
-        switch (opcion) {
-            case 1:
-                cout << "Opción 1 seleccionada" << endl;
-                break;
-            case 2:
-                cout << "Opción 2 seleccionada" << endl;
-                break;
-            case 3:
-                cout << "Saliendo..." << endl;
-                break;
-  
+            bool puestoEncontrado = false;
+            for (int i = 0; i < TOTAL_PUESTOS; i++) {
+                if (!parqueadero[i].ocupado) {
+                    parqueadero[i].ocupado = true;
+                    parqueadero[i].placa = placa;
+                    parqueadero[i].horaEntrada = hora;
+                    cout << "Carro con placa " << placa << " ha sido ingresado en el puesto " << parqueadero[i].numero << endl;
+                    puestoEncontrado = true;
+                    break;
+                }
+            }
+
+            if (!puestoEncontrado) {
+                cout << "No hay puestos disponibles." << endl;
+            }
+
+        } else if (opcion == '2') {
+            string placa, horaSalida;
+            cout << "Ingrese la placa del carro a dar salida: ";
+            cin >> placa;
+            cout << "Ingrese la hora de salida (formato HH:MM): ";
+            cin >> horaSalida;
+
+            bool carroEncontrado = false;
+            for (int i = 0; i < TOTAL_PUESTOS; i++) {
+                if (parqueadero[i].ocupado && parqueadero[i].placa == placa) {
+                    parqueadero[i].ocupado = false;
+                    cout << "Carro con placa " << parqueadero[i].placa << " ha salido del puesto " << parqueadero[i].numero << endl;
+                    carroEncontrado = true;
+                    break;
+                }
+            }
+
+            if (!carroEncontrado) {
+                cout << "No se encontró un carro con esa placa." << endl;
+            }
+
+        } else if (opcion == '3') {
+            int disponibles = 0;
+            for (int i = 0; i < TOTAL_PUESTOS; i++) {
+                if (!parqueadero[i].ocupado) {
+                    disponibles++;
+                }
+            }
+            cout << "Hay " << disponibles << " puestos disponibles de un total de " << TOTAL_PUESTOS << endl;
+
+        } else if (opcion == '4') {
+            cout << "La tarifa actual es: " << tarifaPorHora << " por hora." << endl;
+            cout << "Ingrese la nueva tarifa por hora: ";
+            cin >> tarifaPorHora;
+            cout << "La nueva tarifa es: " << tarifaPorHora << " por hora." << endl;
+
+        } else if (opcion == '5') {
+            cout << "Saliendo del sistema..." << endl;
+
+        } else {
+            cout << "Opción no válida." << endl;
         }
 
-        cout << endl; 
-
-    } while (opcion != 3);
+    } while (opcion != '5');
 
     return 0;
 }
