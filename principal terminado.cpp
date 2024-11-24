@@ -1,35 +1,33 @@
-/******************************************************************************
 
-                            Online C Compiler.
-                Code, Compile, Run and Debug C program online.
-Write your code in this editor and press "Run" button to compile and execute it.
-
-*******************************************************************************/
 
 #include <iostream>
 #include <string>
+#include <cstdlib> // Para usar system("cls")
 using namespace std;
 
-const int TOTAL_PUESTOS = 40; // Total de puestos en el parqueadero
-double tarifaPorHora = 5.0; // Tarifa por hora
+const int TOTAL_PUESTOS = 40; 
+double tarifaPorHora = 5.0;   
+double ingresosTotales = 0.0; 
 
-// Estructura para representar al propietario del vehículo
+
 struct Propietario {
     string nombre;
-    string cedula;
+    int cedula;
+    int telefono;
     string correo;
 };
 
-// Estructura para representar los detalles del vehículo
+
 struct Vehiculo {
     string placa;
     string tipoVehiculo;
     string color;
+    string fechaEntrada; 
     string horaEntrada;
-    string horaSalida; // Hora de salida
+    string horaSalida;
 };
 
-// Estructura para representar un puesto de parqueadero
+
 struct Puesto {
     int numero;
     bool ocupado = false;
@@ -37,75 +35,21 @@ struct Puesto {
     Vehiculo vehiculo;
 };
 
-// Función para convertir hora a minutos
-int convertirHoraEnMinutos(string hora) {
-    int horas, minutos;
-    char separador;
-    string periodo;
-
-    horas = (hora[0] - '0') * 10 + (hora[1] - '0');
-    minutos = (hora[3] - '0') * 10 + (hora[4] - '0');
-    periodo = hora.substr(6, 2); // Obtener AM/PM
-
-    if (periodo == "PM" && horas != 12) {
-        horas += 12; // Convertir a 24 horas
-    }
-    if (periodo == "AM" && horas == 12) {
-        horas = 0; // Medianoche
-    }
-
-    return horas * 60 + minutos;
-}
-
-// Función para validar cédula
-bool validarCedula(string cedula) {
-    int longitud = 0;
-    for (char c : cedula) {
-        if (c < '0' || c > '9') {
-            return false;
-        }
-        longitud++;
-    }
-    return (longitud >= 8 && longitud <= 10); // Validar longitud
-}
-
-// Función para validar placa de carro
-bool validarPlacaCarro(string placa) {
-    if (placa[0] == 0 || placa[1] == 0 || placa[2] == 0 || placa[3] == 0 || placa[4] == 0 || placa[5] == 0) {
-        return false;
-    }
-    if (placa[0] < 'A' || placa[0] > 'Z' || placa[1] < 'A' || placa[1] > 'Z' || placa[2] < 'A' || placa[2] > 'Z') {
-        return false;
-    }
-    for (int i = 3; i < 6; i++) {
-        if (placa[i] < '0' || placa[i] > '9') {
-            return false;
-        }
-    }
-    return true;
-}
-
-// Función para validar placa de moto
-bool validarPlacaMoto(string placa) {
-    if (placa[0] == 0 || placa[1] == 0 || placa[2] == 0 || placa[3] == 0 || placa[4] == 0 || placa[5] == 0) {
-        return false;
-    }
-    if (placa[0] < 'A' || placa[0] > 'Z' || placa[1] < 'A' || placa[1] > 'Z' || placa[2] < 'A' || placa[2] > 'Z') {
-        return false;
-    }
-    for (int i = 3; i < 5; i++) {
-        if (placa[i] < '0' || placa[i] > '9') {
-            return false;
-        }
-    }
-    if (placa[5] < 'A' || placa[5] > 'Z') {
-        return false;
-    }
-    return true;
-}
-
 int main() {
+    Propietario propietario;
+    Vehiculo vehiculo;
+  
     Puesto parqueadero[TOTAL_PUESTOS];
+    // Mostrar La portada
+    system("cls"); // Borra el contenido previo de la consola (solo Windows)
+    cout << "========================================" << endl;
+    cout << "           PROGRAMA FINAL               " << endl;
+    cout << "========================================" << endl;
+    cout << "Autores:                                " << endl;
+    cout << " - Julian David Rativa Ruda             " << endl;
+    cout << " - Laura Camila Guerrero Cuellar        " << endl;
+    cout << "========================================" << endl;
+    cout << endl;
 
     // Inicialización de los puestos
     for (int i = 0; i < TOTAL_PUESTOS; i++) {
@@ -119,11 +63,12 @@ int main() {
         cout << "2. Dar salida a un vehículo del parqueadero\n";
         cout << "3. Consultar puestos disponibles\n";
         cout << "4. Cambiar la tarifa del parqueadero\n";
-        cout << "5. Consultar vehículos ingresados\n";
-        cout << "6. Salir\n";
+        cout << "5. Consultar el porcentaje de disponibilidad\n"; // Nueva opción
+        cout << "6. Consultar vehículos ingresados\n";
+        cout << "7. Consultar ingresos totales\n";
+        cout << "8. Salir\n";
         cout << "Elija una opción: ";
         cin >> opcion;
-
         if (opcion == '1') {
             Vehiculo vehiculo;
             Propietario propietario;
@@ -132,66 +77,188 @@ int main() {
             cin >> vehiculo.tipoVehiculo;
 
             if (vehiculo.tipoVehiculo == "carro") {
-                do {
+                bool formato_valido = false;
+                while (!formato_valido) {
                     cout << "Ingrese la placa del carro (formato ABC123): ";
                     cin >> vehiculo.placa;
-                    if (!validarPlacaCarro(vehiculo.placa)) {
+
+                    if (
+                        ((vehiculo.placa[0] >= 'A' && vehiculo.placa[0] <= 'Z')) &&
+                        ((vehiculo.placa[1] >= 'A' && vehiculo.placa[1] <= 'Z')) &&
+                        ((vehiculo.placa[2] >= 'A' && vehiculo.placa[2] <= 'Z')) &&
+                        (vehiculo.placa[3] >= '0' && vehiculo.placa[3] <= '9') &&
+                        (vehiculo.placa[4] >= '0' && vehiculo.placa[4] <= '9') &&
+                        (vehiculo.placa[5] >= '0' && vehiculo.placa[5] <= '9')) {
+                        formato_valido = true;
+                    } else {
                         cout << "Placa inválida. Debe tener 3 letras seguidas de 3 números.\n";
                     }
-                } while (!validarPlacaCarro(vehiculo.placa)); // Repetir hasta que la placa sea válida
+                }
             } else if (vehiculo.tipoVehiculo == "moto") {
-                do {
+                bool formato_valido = false;
+                while (!formato_valido) {
                     cout << "Ingrese la placa de la moto (formato ABC12D): ";
                     cin >> vehiculo.placa;
-                    if (!validarPlacaMoto(vehiculo.placa)) {
+
+                    if (
+                        ((vehiculo.placa[0] >= 'A' && vehiculo.placa[0] <= 'Z')) &&
+                        ((vehiculo.placa[1] >= 'A' && vehiculo.placa[1] <= 'Z')) &&
+                        ((vehiculo.placa[2] >= 'A' && vehiculo.placa[2] <= 'Z')) &&
+                        (vehiculo.placa[3] >= '0' && vehiculo.placa[3] <= '9') &&
+                        (vehiculo.placa[4] >= '0' && vehiculo.placa[4] <= '9') &&
+                        ((vehiculo.placa[5] >= 'A' && vehiculo.placa[5] <= 'Z'))) {
+                        formato_valido = true;
+                    } else {
                         cout << "Placa inválida. Debe tener 3 letras, seguidas de 2 números y 1 letra.\n";
                     }
-                } while (!validarPlacaMoto(vehiculo.placa)); // Repetir hasta que la placa sea válida
+                }
             } else {
                 cout << "Tipo de vehículo no válido.\n";
-                continue; // Volver al menú principal si el tipo de vehículo no es válido
             }
 
-            cout << "Ingrese la hora de entrada (formato HH:MM AM/PM): ";
-            cin >> vehiculo.horaEntrada;
-            cout << "Ingrese el nombre del propietario: ";
-            cin >> propietario.nombre; // Cambiado a cin
+            if (vehiculo.tipoVehiculo == "carro" || vehiculo.tipoVehiculo == "moto") {
+              
+                   bool fechaValida = false;
+do{
+    cout << "Ingrese la fecha de entrada (formato DD/MM/AAAA): ";
+                cin >> vehiculo.fechaEntrada;
+    // Verificar que el formato sea DD/MM/AAAA con separadores en las posiciones 2 y 5
+    if (vehiculo.fechaEntrada[2] == '/' && vehiculo.fechaEntrada[5] == '/' &&
+        vehiculo.fechaEntrada[0] >= '0' && vehiculo.fechaEntrada[0] <= '9' &&
+        vehiculo.fechaEntrada[1] >= '0' && vehiculo.fechaEntrada[1] <= '9' &&
+        vehiculo.fechaEntrada[3] >= '0' && vehiculo.fechaEntrada[3] <= '9' &&
+        vehiculo.fechaEntrada[4] >= '0' && vehiculo.fechaEntrada[4] <= '9' &&
+        vehiculo.fechaEntrada[6] >= '0' && vehiculo.fechaEntrada[6] <= '9' &&
+        vehiculo.fechaEntrada[7] >= '0' && vehiculo.fechaEntrada[7] <= '9' &&
+        vehiculo.fechaEntrada[8] >= '0' && vehiculo.fechaEntrada[8] <= '9' &&
+        vehiculo.fechaEntrada[9] >= '0' && vehiculo.fechaEntrada[9] <= '9') {
 
-            do {
-                cout << "Ingrese la cédula del propietario (solo números, entre 8 y 10 dígitos): ";
-                cin >> propietario.cedula; // Cambiado a cin
-                if (!validarCedula(propietario.cedula)) {
-                    cout << "Cédula inválida. Asegúrese de que solo contenga números y tenga entre 8 y 10 dígitos.\n";
+        // Convertir día, mes y año a enteros
+        int dia = (vehiculo.fechaEntrada[0] - '0') * 10 + (vehiculo.fechaEntrada[1] - '0');
+        int mes = (vehiculo.fechaEntrada[3] - '0') * 10 + (vehiculo.fechaEntrada[4] - '0');
+        int anio = (vehiculo.fechaEntrada[6] - '0') * 1000 + (vehiculo.fechaEntrada[7] - '0') * 100 +
+                   (vehiculo.fechaEntrada[8] - '0') * 10 + (vehiculo.fechaEntrada[9] - '0');
+
+        // Validar rango de año, mes y día
+        if (anio == 2024) {
+            if (mes >= 1 && mes <= 12) {
+                // Días máximos por mes
+                int diasMaximos = 31;
+                if (mes == 4 || mes == 6 || mes == 9 || mes == 11) {
+                    diasMaximos = 30;
+                } else if (mes == 2) {
+                    // Febrero, considerar años bisiestos
+                    diasMaximos = 29; // 2024 es bisiesto
                 }
-            } while (!validarCedula(propietario.cedula));
 
-            cout << "Ingrese el correo electrónico del propietario: ";
-            cin >> propietario.correo; // Cambiado a cin
-            cout << "Ingrese el color del vehículo: ";
-            cin >> vehiculo.color; // Cambiado a cin
-
-            bool puestoEncontrado = false;
-            for (int i = 0; i < TOTAL_PUESTOS; i++) {
-                if (!parqueadero[i].ocupado) {
-                    parqueadero[i].ocupado = true;
-                    parqueadero[i].vehiculo = vehiculo;
-                    parqueadero[i].propietario = propietario;
-                    cout << "Vehículo con placa " << vehiculo.placa << " ha sido ingresado en el puesto "
-                         << parqueadero[i].numero << ".\n";
-                    cout << "Propietario: " << propietario.nombre << " (Cédula: " << propietario.cedula << ")\n";
-                    puestoEncontrado = true;
-                    break;
+                if (dia >= 1 && dia <= diasMaximos) {
+                    fechaValida = true;
+                } else {
+                    cout << "Día inválido para el mes especificado. Máximo: " << diasMaximos << " días.\n";
                 }
+            } else {
+                cout << "Mes inválido. Debe estar entre 1 y 12.\n";
             }
+        } else {
+            cout << "Año inválido. Debe ser 2024.\n";
+        }
+    } else {
+        cout << "Formato de fecha inválido. Use el formato DD/MM/AAAA.\n";
+    }
 
-            if (!puestoEncontrado) {
-                cout << "No hay puestos disponibles." << endl;
+    if (fechaValida) {
+        cout << "Fecha válida: " << vehiculo.fechaEntrada << endl;
+    } else {
+        cout << "Fecha no válida.\n";
+    }
+
+}while(!fechaValida);
+
+                
+                      bool horaValida = false;
+    do{            
+      cout << "Ingrese la hora de entrada (formato HH:MM AM/PM): ";
+                cin >> vehiculo.horaEntrada;      
+
+    // Validar el formato HH:MM (5 caracteres y un '\0' al final)
+    if (vehiculo.horaEntrada[2] == ':' &&
+        vehiculo.horaEntrada[0] >= '0' && vehiculo.horaEntrada[0] <= '2' && // Primer dígito de la hora (0-2)
+        vehiculo.horaEntrada[1] >= '0' && vehiculo.horaEntrada[1] <= '9' && // Segundo dígito de la hora (0-9)
+        vehiculo.horaEntrada[3] >= '0' && vehiculo.horaEntrada[3] <= '5' && // Primer dígito de los minutos (0-5)
+        vehiculo.horaEntrada[4] >= '0' && vehiculo.horaEntrada[4] <= '9' && // Segundo dígito de los minutos (0-9)
+        vehiculo.horaEntrada[5] == '\0') { // Verificar que no haya caracteres extra
+
+        // Convertir horas y minutos a enteros
+        int horas = (vehiculo.horaEntrada[0] - '0') * 10 + (vehiculo.horaEntrada[1] - '0');
+        int minutos = (vehiculo.horaEntrada[3] - '0') * 10 + (vehiculo.horaEntrada[4] - '0');
+
+        // Validar rango de horas y minutos
+        if (horas >= 0 && horas <= 23 && minutos >= 0 && minutos <= 59) {
+            // Restricción del parqueadero: 6:00 a 21:00
+            if ((horas > 6 || (horas == 6 && minutos >= 0)) && 
+                (horas < 21 || (horas == 21 && minutos == 0))) {
+                horaValida = true;
+            } else {
+                cout << "Horario fuera de servicio. El parqueadero opera de 06:00 a 21:00.\n";
             }
+        } else {
+            cout << "Hora inválida. Debe estar entre 00:00 y 23:59.\n";
+        }
+    } else {
+        cout << "Formato de hora inválido. Use el formato HH:MM.\n";
+    }
 
+    if (horaValida) {
+        cout << "Hora válida: " << vehiculo.horaEntrada << endl;
+    } else {
+        cout << "Hora no válida.\n";
+    }
+
+    }while(!horaValida);
+
+                cout << "Ingrese el nombre del propietario: ";
+                cin >> propietario.nombre;
+
+                do {
+                    cout << "Ingrese la cédula del propietario (solo números, entre 8 y 10 dígitos): ";
+                    cin >> propietario.cedula;
+                } while (propietario.cedula < 10000000 || propietario.cedula > 9999999999);
+
+                do {
+                    cout << "Ingrese el teléfono del propietario (10 dígitos): ";
+                    cin >> propietario.telefono;
+                } while (propietario.telefono < 1000000000 || propietario.telefono > 9999999999);
+
+                cout << "Ingrese el correo electrónico del propietario: ";
+                cin >> propietario.correo;
+                cout << "Ingrese el color del vehículo: ";
+                cin >> vehiculo.color;
+
+                bool puestoEncontrado = false;
+                for (int i = 0; i < TOTAL_PUESTOS; i++) {
+                    if (!parqueadero[i].ocupado) {
+                        parqueadero[i].ocupado = true;
+                        parqueadero[i].vehiculo = vehiculo;
+                        parqueadero[i].propietario = propietario;
+                        cout << "Vehículo con placa " << vehiculo.placa << " ha sido ingresado en el puesto "
+                            << parqueadero[i].numero << ".\n";
+                        cout << "Propietario: " << propietario.nombre << " (Cédula: " << propietario.cedula << ")\n";
+                        puestoEncontrado = true;
+                        break;
+                    }
+                }
+
+                if (!puestoEncontrado) {
+                    cout << "No hay puestos disponibles." << endl;
+                }
+            }   
         } else if (opcion == '2') {
             string placa, horaSalida;
+            int dias;
             cout << "Ingrese la placa del vehículo a dar salida: ";
             cin >> placa;
+            cout << "Ingrese la cantidad de días que el vehículo estuvo en el parqueadero: ";
+            cin >> dias;
             cout << "Ingrese la hora de salida (formato HH:MM AM/PM): ";
             cin >> horaSalida;
 
@@ -199,57 +266,77 @@ int main() {
             for (int i = 0; i < TOTAL_PUESTOS; i++) {
                 if (parqueadero[i].ocupado && parqueadero[i].vehiculo.placa == placa) {
                     parqueadero[i].vehiculo.horaSalida = horaSalida;
-
-                    int minutosEntrada = convertirHoraEnMinutos(parqueadero[i].vehiculo.horaEntrada);
-                    int minutosSalida = convertirHoraEnMinutos(horaSalida);
-                    
-                    int duracion = minutosSalida - minutosEntrada;
-                    int horas = duracion / 60;
-                    int minutos = duracion % 60;
-
                     parqueadero[i].ocupado = false;
+
+                    // Calculo del total de horas adicionales
+                    int horasExtras = 0, minutosExtras = 0; 
+                    // Aquí deberíamos convertir horaEntrada y horaSalida a minutos y calcular el tiempo adicional.
+                    // Agregue la lógica de conversión de horas a minutos para hacer la comparación y calcular horasExtras y minutosExtras.
+
+                    double totalPagar = (dias * 24 + horasExtras + (minutosExtras > 0 ? 1 : 0)) * tarifaPorHora;
+                    ingresosTotales += totalPagar;
 
                     cout << "Vehículo con placa " << parqueadero[i].vehiculo.placa << " ha salido del puesto "
                          << parqueadero[i].numero << "." << endl;
+                    cout << "Fecha de entrada: " << parqueadero[i].vehiculo.fechaEntrada << endl;
                     cout << "Hora de entrada: " << parqueadero[i].vehiculo.horaEntrada << endl;
                     cout << "Hora de salida: " << horaSalida << endl;
-                    cout << "Tiempo total en el parqueadero: " << horas << " horas y " << minutos << " minutos.\n";
-                    cout << "Total a pagar: $" << (horas + (minutos > 0 ? 1 : 0)) * tarifaPorHora << endl; // Cobrando por hora completa
-
+                    cout << "Tiempo total en el parqueadero: " << dias << " días, " 
+                         << horasExtras << " horas y " << minutosExtras << " minutos.\n";
+                    cout << "Total a pagar: $" << totalPagar << endl;
                     carroEncontrado = true;
                     break;
                 }
             }
 
             if (!carroEncontrado) {
-                cout << "No se encontró un vehículo con esa placa." << endl;
+                cout << "No se encontró un vehículo con esa placa.\n";
             }
 
         } else if (opcion == '3') {
+            int puestosDisponibles = 0;
+            for (int i = 0; i < TOTAL_PUESTOS; i++) {
+                if (!parqueadero[i].ocupado) {
+                    puestosDisponibles++;
+                }
+            }
+            cout << "Hay " << puestosDisponibles << " puestos disponibles en el parqueadero.\n";
+
+        } else if (opcion == '4') {
+            cout << "Ingrese la nueva tarifa por hora: ";
+            cin >> tarifaPorHora;
+            cout << "La tarifa por hora ha sido actualizada a $" << tarifaPorHora << endl;
+
+        } else if (opcion == '5') {  // Nueva lógica para consultar porcentaje de disponibilidad
             int disponibles = 0;
             for (int i = 0; i < TOTAL_PUESTOS; i++) {
                 if (!parqueadero[i].ocupado) {
                     disponibles++;
                 }
             }
-            cout << "Hay " << disponibles << " puestos disponibles." << endl;
+            int ocupados = TOTAL_PUESTOS - disponibles;
+            int porcentajeDisponibles = (double)disponibles / TOTAL_PUESTOS * 100;
+            int porcentajeOcupados = (double)ocupados / TOTAL_PUESTOS * 100;
 
-        } else if (opcion == '4') {
-            cout << "Ingrese la nueva tarifa por hora: ";
-            cin >> tarifaPorHora;
-            cout << "La nueva tarifa por hora es: $" << tarifaPorHora << endl;
+            cout << "Hay " << disponibles << " puestos disponibles (" << porcentajeDisponibles << "%)\n";
+            cout << "Hay " << ocupados << " puestos ocupados (" << porcentajeOcupados << "%)\n";
 
-        } else if (opcion == '5') {
-            cout << "Vehículos ingresados:\n";
+        } else if (opcion == '6') {
             for (int i = 0; i < TOTAL_PUESTOS; i++) {
                 if (parqueadero[i].ocupado) {
-                    cout << "Puesto " << parqueadero[i].numero << ": " << parqueadero[i].vehiculo.placa
-                         << " (Propietario: " << parqueadero[i].propietario.nombre << ")\n";
+                    cout << "Puesto " << parqueadero[i].numero << ": "
+                         << parqueadero[i].vehiculo.tipoVehiculo << " con placa "
+                         << parqueadero[i].vehiculo.placa << endl;
                 }
             }
+
+        } else if (opcion == '7') {
+            cout << "Los ingresos totales del parqueadero son: $" << ingresosTotales << endl;
+
         }
 
-    } while (opcion != '6');
+    } while (opcion != '8');
 
     return 0;
 }
+
